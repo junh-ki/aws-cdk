@@ -32,3 +32,18 @@ The initial IAM setup instructions:
 ## Leapp Secrets Manager
 
 As a personal password manager, but for your AWS credentials. Leapp makes it easy to manage all of your keys and rotate them as needed.
+
+## For MacOS
+
+1. `brew update`
+2. `brew upgrade`
+3. `brew install awscli`
+   `aws --version`
+4. `brew install node`
+   `node -v`
+   `npm -v`
+5. `npm install -g aws-cdk`
+   `cdk --version`
+6. `npm install aws-cdk-lib`
+
+And make sure to install the AWS Toolkit extension on your VSCode.
