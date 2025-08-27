@@ -47,3 +47,7 @@ As a personal password manager, but for your AWS credentials. Leapp makes it eas
 6. `npm install aws-cdk-lib`
 
 And make sure to install the AWS Toolkit extension on your VSCode.
+
+## CDK Commands
+
+1. `cdk init app --language typescript` - To initialize your CDK application using the TypeScript boilerplate
