@@ -51,3 +51,9 @@ And make sure to install the AWS Toolkit extension on your VSCode.
 ## CDK Commands
 
 1. `cdk init app --language typescript` - To initialize your CDK application using the TypeScript boilerplate
+2. `cdk bootstrap --profile cdk-developer-junhki` - To bootstrap your CDK application
+
+## CDK Application Workflow (as precommit hooks)
+
+1. `npm install`
+2. `npm run build`
