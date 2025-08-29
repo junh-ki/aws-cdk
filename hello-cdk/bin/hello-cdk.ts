@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register'; // To get JavaScript stack traces from TypeScript errors
 import * as cdk from 'aws-cdk-lib';
-import { HelloCdkStack } from '../lib/hello-cdk-stack';
+import { HelloCdkStack } from '../lib/stack-hello-cdk';
 
 const app = new cdk.App();
 new HelloCdkStack(app, 'HelloCdkStack', {

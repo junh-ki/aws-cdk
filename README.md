@@ -45,6 +45,8 @@ As a personal password manager, but for your AWS credentials. Leapp makes it eas
 5. `npm install -g aws-cdk`
    `cdk --version`
 6. `npm install aws-cdk-lib`
+7. `npm init`
+8. `npm install @aws-sdk/client-s3`
 
 And make sure to install the AWS Toolkit extension on your VSCode.
 
@@ -55,7 +57,9 @@ And make sure to install the AWS Toolkit extension on your VSCode.
 3. `cdk synth --profile cdk-developer-junhki` - To synthesize your CDK application (the resulting CloudFormation templates are written to the cdk.out directory)
 4. `cdk deploy --profile cdk-developer-junhki` - To deploy the resources defined in the CDK app
 
-## CDK Application Workflow (as precommit hooks)
+## CDK Application Workflow
 
 1. `npm install`
 2. `npm run build`
+3. `cdk synth --profile cdk-developer-junhki`
+4. `cdk deploy --all --profile cdk-developer-junhki`
