@@ -50,12 +50,26 @@ As a personal password manager, but for your AWS credentials. Leapp makes it eas
 
 And make sure to install the AWS Toolkit extension on your VSCode.
 
+## CDK Concepts
+
+1. App: The root of your CDK application (your whole project)
+2. Stack: A unit of deployment in CDK, representing a CloudFormation stack
+3. Construct: The basic building block of CDK apps, a class that represents one or more AWS resources
+(e.g., `bucket = s3.Bucket(self, 'MyBucket')`)
+   - L1: Low level, direct CloudFormation resources
+   - L2: High level, pre-built abstractions (e.g., aws_s3.Bucket)
+   - L3: Opinionated combinations of resources (e.g., aws_apigateway.LambdaRestApi)
+4. Context: key-value paris you can pass into the apps at runtime, configuration values to control how your app behaves (dev/test/prod)
+
 ## CDK Commands
 
 1. `cdk init app --language typescript` - To initialize your CDK application using the TypeScript boilerplate
 2. `cdk bootstrap --profile cdk-developer-junhki` - To bootstrap your CDK application (needed only once)
 3. `cdk synth --profile cdk-developer-junhki` - To synthesize your CDK application (the resulting CloudFormation templates are written to the cdk.out directory)
 4. `cdk deploy --profile cdk-developer-junhki` - To deploy the resources defined in the CDK app
+5. `cdk list --profile cdk-developer-junhki` - To list all the stacks deployed by the CDK app in your AWS account
+6. `cdk context --profile cdk-developer-junhki` - To set context values for your CDK app, which can be used to configure app-specific settings
+7. `cdk doctor --profile cdk-developer-junhki` - To check your CDK app for common issues and provides recommendations on how to fix them
 
 ## CDK Application Workflow
 
