@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { aws_lambda as lambda, aws_s3 as s3 } from 'aws-cdk-lib';
 import { Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
+import { MyCustomS3Bucket } from './s3/my-custom-s3-bucket';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 
@@ -19,6 +20,12 @@ export class HelloCdkStack extends cdk.Stack {
       bucketName: 'raw-data-landing-zone-greeting-l2',
       encryption: BucketEncryption.KMS,
       versioned: true,
+    });
+
+    // Level 3 (L3) construct for S3 Bucket with custom configurations
+    const myCustomS3 = new MyCustomS3Bucket(this, 'MyCustomS3', {
+      bucketName: 'my-custom-bucket-l3',
+      expirationDays: 120,
     });
 
     const helloCdkLambda = new NodejsFunction(this, 'HelloCdkLambda', {
