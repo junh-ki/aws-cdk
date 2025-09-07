@@ -1,44 +1,54 @@
 import * as cdk from 'aws-cdk-lib';
-import { aws_lambda as lambda, aws_s3 as s3 } from 'aws-cdk-lib';
-import { Bucket, BucketEncryption, CfnBucket } from 'aws-cdk-lib/aws-s3';
-import { MyCustomS3Bucket } from './s3/my-custom-s3-bucket';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { aws_lambda as lambda, aws_s3 as s3, aws_s3_notifications as s3n } from 'aws-cdk-lib';
 import * as path from 'path';
 
 export class HelloCdkStack extends cdk.Stack {
+
+  /**
+   * Constructor for the stack
+   * @param {cdk.App} scope - The CDK application scope
+   * @param {string} id - Stack ID
+   * @param {cdk.StackProps} props - Optional stack properties
+   */
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Level 1 (L1) construct for S3 Bucket
-    const rawDataBucketL1 = new CfnBucket(this, 'rawDataBucket', {
-      bucketName: 'raw-data-landing-zone-greeting-l1',
-      accessControl: 'Private'
-    });
-
-    // Level 2 (L2) construct for S3 Bucket
-    const rawDataBucketL2 = new Bucket(this, 'MyS3Bucket', {
-      bucketName: 'raw-data-landing-zone-greeting-l2',
-      encryption: BucketEncryption.KMS,
-      versioned: true,
-    });
-
-    // Level 3 (L3) construct for S3 Bucket with custom configurations
-    const myCustomS3 = new MyCustomS3Bucket(this, 'MyCustomS3', {
-      bucketName: 'my-custom-bucket-l3',
-      expirationDays: 120,
-    });
-
-    const helloCdkLambda = new NodejsFunction(this, 'HelloCdkLambda', {
-      entry: path.join(__dirname, './lambda/lambda-hello-cdk/index.ts'),
-      handler: 'main', // function name you exported
-      runtime: lambda.Runtime.NODEJS_22_X,
-    });
-
-    const helloBucket = new s3.Bucket(this, 'HelloCdkS3Bucket', {
-      versioned: true,
+    const helloCdkS3Bucket = new s3.Bucket(this, 'HelloCdkS3Bucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      lifecycleRules: [
+        {
+          expiration: cdk.Duration.days(1),
+        },
+      ],
     });
 
-    helloBucket.grantReadWrite(helloCdkLambda)
+    const helloCdkLambdaFunction = new lambda.Function(this, 'HelloCdkLambda', {
+      description:
+        `Lambda function generates
+        a dynamic greeting by retrieving the text from an
+        S3 object and when triggered by S3 events`,
+      runtime: lambda.Runtime.NODEJS_22_X,
+      handler: 'index.main',
+      code: lambda.Code.fromAsset(
+        path.join(__dirname, './lambda/lambda-hello-cdk')
+      ),
+      environment: {
+        NODE_OPTIONS: '--enable-source-maps',
+      },
+    });
+
+    helloCdkS3Bucket.grantRead(helloCdkLambdaFunction);
+
+    helloCdkS3Bucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED,
+      new s3n.LambdaDestination(helloCdkLambdaFunction),
+      { suffix: '.txt' }
+    );
+
+    new cdk.CfnOutput(this, 'bucketName', {
+      value: helloCdkS3Bucket.bucketName,
+      description: 'Name of the S3 bucket for uploading greetings',
+    });
   }
 }
