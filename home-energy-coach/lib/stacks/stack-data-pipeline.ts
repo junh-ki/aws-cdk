@@ -31,7 +31,7 @@ export class HelloCdkStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.main',
       code: lambda.Code.fromAsset(
-        path.join(__dirname, './lambda/lambda-hello-cdk')
+        path.join(__dirname, '../lambda/lambda-hello-cdk')
       ),
       environment: {
         NODE_OPTIONS: '--enable-source-maps',
