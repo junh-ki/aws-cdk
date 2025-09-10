@@ -75,5 +75,5 @@ And make sure to install the AWS Toolkit extension on your VSCode.
 
 1. `npm install`
 2. `npm run build`
-3. `cdk synth --profile cdk-developer-junhki`
-4. `cdk deploy --all --profile cdk-developer-junhki`
+3. `cdk synth --profile cdk-developer-junhki -c adminEmailAddress=kijoonh91@gmail.com`
+4. `cdk deploy --all --profile cdk-developer-junhki -c adminEmailAddress=kijoonh91@gmail.com`
