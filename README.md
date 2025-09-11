@@ -45,7 +45,7 @@ As a personal password manager, but for your AWS credentials. Leapp makes it eas
 5. `npm install -g aws-cdk`
    `cdk --version`
 6. `npm install aws-cdk-lib`
-7. `npm init`
+7. `npm init` - To create a package.json file in the directory. This file defines your project and its dependencies
 8. `npm install @aws-sdk/client-s3`
 
 And make sure to install the AWS Toolkit extension on your VSCode.

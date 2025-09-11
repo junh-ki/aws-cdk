@@ -1,17 +1,19 @@
 {
-  "name": "lambda-hello-cdk",
+  "name": "lambda-transform-to-json",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.886.0",
+    "csvtojson": "^2.0.10"
+  },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.152"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.883.0"
   }
 }

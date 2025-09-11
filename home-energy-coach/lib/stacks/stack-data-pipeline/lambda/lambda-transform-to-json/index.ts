@@ -1,69 +1,76 @@
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import { S3Event } from 'aws-lambda';
-import { Readable } from "stream"; // Node.js stream
+import { Readable } from 'stream';
+import csv from 'csvtojson';
 
-const s3Client = new S3Client();
+const client = new S3Client({ region: process.env.AWS_REGION });
+const DESTINATION_BUCKET = process.env.jsonTransformedBucket;
 
 /**
  * Lambda function invoked on S3 object created event
  */
-export const main = async (event: S3Event): Promise<{ statusCode: number; body: string }> => {
-  console.log("Lambda function invoked");
-
-  // Get bucket and object key from event
+export const main = async (event: S3Event) => {
   const bucket = event.Records[0].s3.bucket.name;
   const key = event.Records[0].s3.object.key;
 
-  // Get object data from S3
-  const params = {
+  console.log(
+    `Event passed to Lambda including:\n Bucket: ${bucket} Key: ${key}`
+  );
+
+  const input = {
     Bucket: bucket,
     Key: key,
   };
 
   try {
-    const command = new GetObjectCommand(params);
-    const response = await s3Client.send(command);
+    const command = new GetObjectCommand(input);
+    const response = await client.send(command);
 
-    // Convert stream to string
+    if (!response.Body) {
+      throw new Error("S3 object body is undefined.");
+    }
+
     const stream = response.Body as Readable;
-    const chunks: Uint8Array[] = [];
+    const chunks: Buffer[] = [];
     for await (const chunk of stream) {
       chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
     }
-    const buffer = Buffer.concat(chunks);
-    const name = buffer.toString("utf-8").trim();
+    const fileContents = Buffer.concat(chunks).toString('utf8');
 
-    console.log(`Name extracted from S3 object: "${name}"`);
+    // Convert CSV to JSON
+    const jsonArray = await csv().fromString(fileContents);
 
-    // Print greeting with name
-    const msg = `Hello, ${name}! I am your new energy assistant.`;
-    console.log(`Greeting: ${msg}`);
+    // Upload JSON data to the destination bucket
+    const putCommand = new PutObjectCommand({
+      Bucket: DESTINATION_BUCKET,
+      Key: key.replace('.csv', '.json'), // Assume the key had a .csv extension
+      Body: JSON.stringify(jsonArray),
+      ContentType: 'application/json',
+    });
+
+    await client.send(putCommand);
+
+    console.log(
+      `File transformed and uploaded to: ${DESTINATION_BUCKET}/${key.replace('.csv', '.json')}`
+    );
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: msg,
+        message: 'CSV successfully transformed to JSON and uploaded to the destination bucket.',
       }),
     };
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error:", error);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: "Error processing request",
-          error: error.message,
-        }),
-      };
-    }
-    console.error("Unknown error:", error);
+    console.error(error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Unknown error occurred",
+        message: 'Error processing the operation.',
       }),
     };
   }
 };
-
-module.exports = { main };
